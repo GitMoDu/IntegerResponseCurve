@@ -28,7 +28,7 @@ public:
 
 	virtual const uint16_t Process(const uint16_t input)
 	{
-		return ((input * input) + UINT16_MAX) >> 16;
+		return (((uint32_t)input * input) + UINT16_MAX) >> 16;
 
 		//Aproximation of:
 		//return ((input * input) + 2) / UINT16_MAX;
@@ -44,6 +44,8 @@ public:
 	virtual const uint8_t Process(const uint8_t input)
 	{
 		return ((input * input * input) + UINT16_MAX) >> 16;
+
+		return (((uint32_t)input * input * input) + UINT16_MAX) >> 16;
 
 		//Aproximation of:
 		//return ((uint16_t)input * input * input) / UINT16_MAX;
@@ -67,6 +69,8 @@ public:
 	virtual const uint16_t Process(const uint16_t input)
 	{
 		return (((uint64_t)input * input * input) + (UINT32_MAX)) >> 32;
+
+		return (((uint64_t)input * input * input) + UINT32_MAX) >> 32;
 
 		//Aproximation of:
 		//return (((uint64_t)input * input * input)) / UINT32_MAX;
