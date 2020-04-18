@@ -58,14 +58,6 @@ public:
 	Power3CurveU16(const uint8_t saturation = 127) : TemplateResponseCurveU16(saturation)
 	{}
 
-	void Debug()
-	{
-		Serial.println(F("Divisor"));
-		//Serial.print((uint32_t)GetDivisor());
-		Serial.println();
-
-	}
-
 	virtual const uint16_t Process(const uint16_t input)
 	{
 		return (((uint64_t)input * input * input) + (UINT32_MAX)) >> 32;
