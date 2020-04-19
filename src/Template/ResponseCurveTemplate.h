@@ -50,19 +50,7 @@ public:
 class TemplateResponseCurveU8 : public AbstractTemplateResponseCurve<uint8_t, 0, UINT8_MAX>
 {
 private:
-	static const uint8_t DivisorShift = 7;
-
-	uint8_t Alpha = GetDivisor();
-	uint8_t Beta = 0;
-
-	const uint8_t GetDivisor()
-	{
-		return 1 << DivisorShift;
-	}
-
-protected:
-	uint8_t ValueHelper = 0;
-
+	uint8_t Saturation = 0;
 
 public:
 	TemplateResponseCurveU8(const uint8_t saturation = 127)
@@ -73,38 +61,26 @@ public:
 
 	void SetSaturation(const uint8_t saturation)
 	{
-		Beta = map(saturation, 0, UINT8_MAX, 0, GetDivisor());
-		Alpha = GetDivisor() - Beta;
+		Saturation = saturation;
 	}
 
-	const uint8_t Saturate(const uint8_t processed, const uint8_t input)
+	uint8_t Saturate(const uint8_t processed, const uint8_t input)
 	{
-		return (((uint16_t)input * Alpha) + ((uint16_t)processed * Beta)) / GetDivisor();
+		return ((Saturation * (processed - input)) / UINT8_MAX) + input;
 	}
 
 	uint8_t Get(const uint8_t input)
 	{
-		ValueHelper = Saturate(Process(input), input);
+		uint8_t value = Saturate(Process(input), input);
 
-		return constrain(ValueHelper, Limits.Lower, Limits.Upper);
+		return constrain(value, Limits.Lower, Limits.Upper);
 	}
 };
 
 class TemplateResponseCurveU16 : public AbstractTemplateResponseCurve<uint16_t, 0, UINT16_MAX>
 {
 private:
-	static const uint8_t DivisorShift = 7;
-
-	uint8_t Alpha = GetDivisor();
-	uint8_t Beta = 0;
-
-	const uint8_t GetDivisor()
-	{
-		return 1 << DivisorShift;
-	}
-
-protected:
-	uint16_t ValueHelper = 0;
+	uint8_t Saturation = 0;
 
 public:
 	TemplateResponseCurveU16(const uint8_t saturation = 127)
@@ -113,23 +89,21 @@ public:
 		SetSaturation(saturation);
 	}
 
-
-	virtual void SetSaturation(const uint8_t saturation)
+	void SetSaturation(const uint8_t saturation)
 	{
-		Beta = map(saturation, 0, UINT8_MAX, 0, GetDivisor());
-		Alpha = GetDivisor() - Beta;
+		Saturation = saturation;
 	}
 
-	const uint16_t Saturate(const uint16_t processed, const uint16_t input)
+	uint16_t Saturate(const uint16_t processed, const uint16_t input)
 	{
-		return (((uint32_t)input * Alpha) + ((uint32_t)processed * Beta)) / GetDivisor();
+		return ((Saturation * ((int32_t)processed - input)) / UINT8_MAX) + input;
 	}
 
 	uint16_t Get(const uint16_t input)
 	{
-		ValueHelper = Saturate(Process(input), input);
+		uint16_t value = Saturate(Process(input), input);
 
-		return constrain(ValueHelper, Limits.Lower, Limits.Upper);
+		return constrain(value, Limits.Lower, Limits.Upper);
 	}
 };
 
@@ -273,7 +247,7 @@ public:
 		}
 	}
 
-	const int16_t Saturate(const int16_t processed, const int16_t input)
+	int16_t Saturate(const int16_t processed, const int16_t input)
 	{
 		if (input > 0)
 		{
@@ -291,21 +265,23 @@ public:
 
 	int16_t Get(const int16_t input)
 	{
+		int16_t value = 0;
+
 		if (input > 0)
 		{
-			ValueHelper = (int16_t)(UnsignedResponse.Saturate(UnsignedResponse.Process((((uint16_t)input) * 2) + 1), input) / 2);
+			value = (int16_t)(UnsignedResponse.Saturate(UnsignedResponse.Process((((uint16_t)input) * 2) + 1), input) / 2);
 
-			return constrain(ValueHelper, Limits.Lower, Limits.Upper);
+			return constrain(value, Limits.Lower, Limits.Upper);
 		}
 		else if (input < 0)
 		{
-			ValueHelper = (int16_t)(-((UnsignedResponse.Saturate(UnsignedResponse.Process((((uint16_t)(-input - 1)) * 2)), input) / 2) + 1));
+			value = (int16_t)(-((UnsignedResponse.Saturate(UnsignedResponse.Process((((uint16_t)(-input - 1)) * 2)), input) / 2) + 1));
 
-			return constrain(ValueHelper, Limits.Lower, Limits.Upper);
+			return constrain(value, Limits.Lower, Limits.Upper);
 		}
 		else
 		{
-			return 0;
+			return value;
 		}
 	}
 };
