@@ -78,8 +78,9 @@ void PlotLinearOutput()
 	Serial.println(F("Input\tSquar16\tCube16\tRoot16"));
 	for (uint16_t i = 0; i <= LinearTestSize; i++)
 	{
-		uint16_t Input = 0;
-		Input = map(i, 0, LinearTestSize, 0, UINT16_MAX);
+		const uint16_t Input = map(i, 0, LinearTestSize, 0, UINT16_MAX);
+		//const uint16_t Input = map(i, 0, LinearTestSize, UINT16_MAX- LinearTestSize, UINT16_MAX);
+		//const uint16_t Input = map(i, 0, LinearTestSize, 0, LinearTestSize);
 		Serial.print(Input);
 		Serial.print('\t');
 		Serial.print(PowerSquare16.Get(Input));
@@ -95,7 +96,6 @@ void MeasureDurations()
 {
 	Serial.println(F("Reference duration measure"));
 	Serial.println();
-
 
 
 	uint16_t TestValue = 0;
@@ -203,14 +203,14 @@ void MeasureDurations()
 	Serial.println(ReferenceDurationU8);
 	Serial.print(F("U16: "));
 	Serial.println(ReferenceDurationU16);
-	Serial.print(F("S8:"));
+	Serial.print(F("S8: "));
 	Serial.println(ReferenceDurationS8);
 	Serial.print(F("S16: "));
 	Serial.println(ReferenceDurationS16);
 	Serial.println();
 
 	Serial.print(F("Response curve processing duration "));
-	if (ReferenceDurationU8 > 5000)
+	if (ReferenceDurationU8 > 40000)
 	{
 		DurationPowerSquare8 /= 1000;
 		DurationPowerCube8 /= 1000;
@@ -229,7 +229,7 @@ void MeasureDurations()
 	Serial.println(DurationPowerCube8);
 	Serial.print(F("RootU8: "));
 	Serial.println(DurationRoot8);
-	Serial.print(F("Square16:"));
+	Serial.print(F("Square16: "));
 	Serial.println(DurationPowerSquare16);
 	Serial.print(F("Cube16: "));
 	Serial.println(DurationPowerCube16);
