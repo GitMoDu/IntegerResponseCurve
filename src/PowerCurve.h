@@ -13,10 +13,8 @@ public:
 
 	virtual const uint8_t Process(const uint8_t input)
 	{
-		return ((input * input) + UINT8_MAX) >> 8;
-
-		//Aproximation of:
-		//return ((input * input)) / UINT8_MAX;
+		// Optimized version of min(pow(input, 2) / (UINT8_MAX - 1), UINT8_MAX).
+		return (((uint16_t)input * input) + (input)) >> 8;
 	}
 };
 
@@ -28,10 +26,8 @@ public:
 
 	virtual const uint16_t Process(const uint16_t input)
 	{
-		return (((uint32_t)input * input) + UINT16_MAX) >> 16;
-
-		//Aproximation of:
-		//return ((input * input) + 2) / UINT16_MAX;
+		// Optimized version of pow(input, 2) / UINT16_MAX.
+		return (((uint32_t)input * input) + input) >> 16;
 	}
 };
 
@@ -43,12 +39,8 @@ public:
 
 	virtual const uint8_t Process(const uint8_t input)
 	{
-		return ((input * input * input) + UINT16_MAX) >> 16;
-
-		return (((uint32_t)input * input * input) + UINT16_MAX) >> 16;
-
-		//Aproximation of:
-		//return ((uint16_t)input * input * input) / UINT16_MAX;
+		// Optimized version of  min(pow(input, 3) / (UINT16_MAX - (UINT8_MAX * 3)), UINT8_MAX).
+		return  (((uint16_t)input * input * (uint32_t)(input + 3))) >> 16;
 	}
 };
 
@@ -60,12 +52,9 @@ public:
 
 	virtual const uint16_t Process(const uint16_t input)
 	{
-		return (((uint64_t)input * input * input) + (UINT32_MAX)) >> 32;
-
-		return (((uint64_t)input * input * input) + UINT32_MAX) >> 32;
-
-		//Aproximation of:
-		//return (((uint64_t)input * input * input)) / UINT32_MAX;
+		// Optimized version of pow(input, 3) / (UINT32_MAX - ((uint32_t)UINT16_MAX * 3)).
+		uint32_t Power2Shifted = (uint32_t)input * input >> 16;
+		return (((Power2Shifted)*input) + (Power2Shifted + ((uint32_t)input + 1))) >> 16;
 	}
 };
 #endif
