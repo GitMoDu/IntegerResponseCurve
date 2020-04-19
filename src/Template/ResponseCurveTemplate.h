@@ -111,7 +111,7 @@ template<class ResponseCurveU, typename UnsignedType>
 class TemplateDoubleCurve : public ResponseCurveU
 {
 public:
-	TemplateDoubleCurve(const uint8_t saturation = 127) 
+	TemplateDoubleCurve(const uint8_t saturation = 127)
 		: ResponseCurveU(saturation)
 	{}
 
@@ -125,7 +125,7 @@ template<class ResponseCurveU16>
 class TemplateDoubleCurveU16 : public TemplateDoubleCurve<ResponseCurveU16, uint16_t>
 {
 public:
-	TemplateDoubleCurveU16(const uint8_t saturation = 127) 
+	TemplateDoubleCurveU16(const uint8_t saturation = 127)
 		: TemplateDoubleCurve<ResponseCurveU16, uint16_t>(saturation)
 	{}
 };
@@ -194,7 +194,7 @@ public:
 		}
 	}
 
-	const int8_t Saturate(const int8_t processed, const int8_t input)
+	int8_t Saturate(const int8_t processed, const int8_t input)
 	{
 		if (input > 0)
 		{
