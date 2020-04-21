@@ -107,6 +107,36 @@ public:
 	}
 };
 
+class TemplateResponseCurveU32 : public AbstractTemplateResponseCurve<uint32_t, 0, UINT32_MAX>
+{
+private:
+	uint8_t Saturation = 0;
+
+public:
+	TemplateResponseCurveU32(const uint8_t saturation = 127)
+		: AbstractTemplateResponseCurve<uint32_t, 0, UINT32_MAX>()
+	{
+		SetSaturation(saturation);
+	}
+
+	void SetSaturation(const uint8_t saturation)
+	{
+		Saturation = saturation;
+	}
+
+	uint32_t Saturate(const uint32_t processed, const uint32_t input)
+	{
+		return ((Saturation * ((int64_t)processed - input)) / UINT8_MAX) + input;
+	}
+
+	uint32_t Get(const uint32_t input)
+	{
+		uint32_t value = Saturate(Process(input), input);
+
+		return constrain(value, Limits.Lower, Limits.Upper);
+	}
+};
+
 template<class ResponseCurveU, typename UnsignedType>
 class TemplateDoubleCurve : public ResponseCurveU
 {
