@@ -151,21 +151,30 @@ public:
 	}
 };
 
-template<class ResponseCurveU16>
-class TemplateDoubleCurveU16 : public TemplateDoubleCurve<ResponseCurveU16, uint16_t>
+template<class ResponseCurveU8>
+class TemplateDoubleChainedCurveU8 : public TemplateDoubleChainedCurve<ResponseCurveU8, uint8_t>
 {
 public:
-	TemplateDoubleCurveU16(const uint8_t saturation = 127)
-		: TemplateDoubleCurve<ResponseCurveU16, uint16_t>(saturation)
+	TemplateDoubleChainedCurveU8(const uint8_t saturation = 127)
+		: TemplateDoubleChainedCurve<ResponseCurveU8, uint8_t>(saturation)
 	{}
 };
 
-template<class ResponseCurveU8>
-class TemplateDoubleCurveU8 : public TemplateDoubleCurve<ResponseCurveU8, uint8_t>
+template<class ResponseCurveU16>
+class TemplateDoubleChainedCurveU16 : public TemplateDoubleChainedCurve<ResponseCurveU16, uint16_t>
 {
 public:
-	TemplateDoubleCurveU8(const uint8_t saturation = 127)
-		: TemplateDoubleCurve<ResponseCurveU8, uint8_t>(saturation)
+	TemplateDoubleChainedCurveU16(const uint8_t saturation = 127)
+		: TemplateDoubleChainedCurve<ResponseCurveU16, uint16_t>(saturation)
+	{}
+};
+
+template<class ResponseCurveU32>
+class TemplateDoubleChainedCurveU32 : public TemplateDoubleChainedCurve<ResponseCurveU32, uint32_t>
+{
+public:
+	TemplateDoubleChainedCurveU32(const uint8_t saturation = 127)
+		: TemplateDoubleChainedCurve<ResponseCurveU32, uint32_t>(saturation)
 	{}
 };
 
