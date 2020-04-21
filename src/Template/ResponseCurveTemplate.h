@@ -178,16 +178,18 @@ public:
 	{}
 };
 
-template<class ResponseCurveU8>
-class TemplateResponseCurveS8 : AbstractTemplateResponseCurve<int8_t, INT8_MIN, INT8_MAX>
+template<typename ValueType, const ValueType MinValue, const ValueType MaxValue, typename UnsignedType, class ResponseCurveU>
+class TemplateResponseCurveS : AbstractTemplateResponseCurve<ValueType, MinValue, MaxValue>
 {
 private:
-	ResponseCurveU8 UnsignedResponse;
-	int8_t ValueHelper = 0;
+	ResponseCurveU UnsignedResponse;
+
+protected:
+	using AbstractTemplateResponseCurve<ValueType, MinValue, MaxValue>::Limits;
 
 public:
-	TemplateResponseCurveS8(const uint8_t saturation = 127)
-		: AbstractTemplateResponseCurve<int8_t, INT8_MIN, INT8_MAX >()
+	TemplateResponseCurveS(const uint8_t saturation = 127)
+		: AbstractTemplateResponseCurve<ValueType, MinValue, MaxValue>()
 		, UnsignedResponse(saturation)
 	{
 	}
@@ -197,19 +199,42 @@ public:
 		UnsignedResponse.SetSaturation(saturation);
 	}
 
-	int8_t Get(const int8_t input)
+	ValueType const Process(const ValueType input)
 	{
-		if (input > 0)
+		return 0;
+		/*if (input > 0)
 		{
-			ValueHelper = (int8_t)(UnsignedResponse.Saturate(UnsignedResponse.Process((((uint8_t)input) * 2) + 1), input) / 2);
+			UnsignedType inputU = ((UnsignedType)input * 2) + 1;
 
-			return constrain(ValueHelper, Limits.Lower, Limits.Upper);
+			return (ValueType)(UnsignedResponse.Process(inputU) / 2);
 		}
 		else if (input < 0)
 		{
-			ValueHelper = (int8_t)(-((UnsignedResponse.Saturate(UnsignedResponse.Process((((uint8_t)(-input) - 1) * 2)), input) / 2) + 1));
+			UnsignedType inputU = (UnsignedType)(-input * 2);
 
-			return constrain(ValueHelper, Limits.Lower, Limits.Upper);
+			return (ValueType)(-(UnsignedResponse.Process(inputU) / 2));
+		}
+		else
+		{
+			return 0;
+		}*/
+	}
+
+	ValueType Saturate(const ValueType processed, const ValueType input)
+	{
+		if (input > 0)
+		{
+			UnsignedType inputU = (UnsignedType)(input * 2) + 1;
+			UnsignedType processedU = (UnsignedType)(processed * 2) + 1;
+
+			return (ValueType)(UnsignedResponse.Saturate(processedU, inputU) / 2);
+		}
+		else if (input < 0)
+		{
+			UnsignedType inputU = (UnsignedType)(-input * 2);
+			UnsignedType processedU = (UnsignedType)(-processed * 2);
+
+			return (ValueType)(-(UnsignedResponse.Saturate(processedU, inputU) / 2));
 		}
 		else
 		{
@@ -217,31 +242,31 @@ public:
 		}
 	}
 
-	int8_t const Process(const int8_t input)
+	ValueType Get(const ValueType input)
 	{
-		if (input > 0)
-		{
-			return (int8_t)((UnsignedResponse.Process((((uint8_t)input) * 2) + 1), input) / 2);
-		}
-		else if (input < 0)
-		{
-			return (int8_t)(-((UnsignedResponse.Saturate(UnsignedResponse.Process((((uint8_t)(-input) - 1) * 2)), input) / 2) + 1));
-		}
-		else
-		{
-			return 0;
-		}
-	}
+		ValueType value;
+		UnsignedType inputU;
+		UnsignedType processedU;
 
-	int8_t Saturate(const int8_t processed, const int8_t input)
-	{
 		if (input > 0)
 		{
-			return (int8_t)(UnsignedResponse.Saturate((((uint8_t)input) * 2) + 1) / 2);
+			inputU = (UnsignedType)(input * 2) + 1;
+			processedU = UnsignedResponse.Process(inputU);
+			processedU = UnsignedResponse.Saturate(processedU, inputU);
+
+			value = (ValueType)(processedU / 2);
+
+			return constrain(value, Limits.Lower, Limits.Upper);
 		}
 		else if (input < 0)
 		{
-			return (int8_t)(-(((UnsignedResponse.Saturate((((uint8_t)(-input - 1)) * 2)), input) / 2) + 1));
+			inputU = (UnsignedType)(-input * 2);
+			processedU = UnsignedResponse.Process(inputU);
+			processedU = UnsignedResponse.Saturate(processedU, inputU);
+
+			value = (ValueType)(-(processedU / 2));
+
+			return constrain(value, Limits.Lower, Limits.Upper);
 		}
 		else
 		{
@@ -250,78 +275,30 @@ public:
 	}
 };
 
-template<class ResponseCurveU16>
-class TemplateResponseCurveS16 : AbstractTemplateResponseCurve<int16_t, INT16_MIN, INT16_MAX>
+template<class ResponseCurveU8>
+class TemplateResponseCurveS8 : public TemplateResponseCurveS<int8_t, INT8_MIN, INT8_MAX, uint8_t, ResponseCurveU8>
 {
-private:
-	ResponseCurveU16 UnsignedResponse;
+public:
+	TemplateResponseCurveS8(const uint8_t saturation = 127)
+		: TemplateResponseCurveS<int8_t, INT8_MIN, INT8_MAX, uint8_t, ResponseCurveU8>(saturation)
+	{}
+};
 
-	int16_t ValueHelper = 0;
-
+template<class ResponseCurveU16>
+class TemplateResponseCurveS16 : public TemplateResponseCurveS<int16_t, INT16_MIN, INT16_MAX, uint16_t, ResponseCurveU16>
+{
 public:
 	TemplateResponseCurveS16(const uint8_t saturation = 127)
-		: AbstractTemplateResponseCurve<int16_t, INT16_MIN, INT16_MAX>()
-		, UnsignedResponse(saturation)
-	{
-	}
+		: TemplateResponseCurveS<int16_t, INT16_MIN, INT16_MAX, uint16_t, ResponseCurveU16>(saturation)
+	{}
+};
 
-	void SetSaturation(const uint8_t saturation)
-	{
-		UnsignedResponse.SetSaturation(saturation);
-	}
-
-	int16_t const Process(const uint16_t input)
-	{
-		if (input > 0)
-		{
-			return (int16_t)(UnsignedResponse.Process((((uint16_t)input) * 2) + 1) / 2);
-		}
-		else if (input < 0)
-		{
-			return (int16_t)(-(((UnsignedResponse.Process((((uint16_t)(-input - 1)) * 2)), input) / 2) + 1));
-		}
-		else
-		{
-			return 0;
-		}
-	}
-
-	int16_t Saturate(const int16_t processed, const int16_t input)
-	{
-		if (input > 0)
-		{
-			return (int16_t)(UnsignedResponse.Saturate((((uint16_t)input) * 2) + 1) / 2);
-		}
-		else if (input < 0)
-		{
-			return (int16_t)(-(((UnsignedResponse.Saturate((((uint16_t)(-input - 1)) * 2)), input) / 2) + 1));
-		}
-		else
-		{
-			return 0;
-		}
-	}
-
-	int16_t Get(const int16_t input)
-	{
-		int16_t value = 0;
-
-		if (input > 0)
-		{
-			value = (int16_t)(UnsignedResponse.Saturate(UnsignedResponse.Process((((uint16_t)input) * 2) + 1), input) / 2);
-
-			return constrain(value, Limits.Lower, Limits.Upper);
-		}
-		else if (input < 0)
-		{
-			value = (int16_t)(-((UnsignedResponse.Saturate(UnsignedResponse.Process((((uint16_t)(-input - 1)) * 2)), input) / 2) + 1));
-
-			return constrain(value, Limits.Lower, Limits.Upper);
-		}
-		else
-		{
-			return value;
-		}
-	}
+template<class ResponseCurveU32>
+class TemplateResponseCurveS32 : public TemplateResponseCurveS<int32_t, INT32_MIN, INT32_MAX, uint32_t, ResponseCurveU32>
+{
+public:
+	TemplateResponseCurveS32(const uint8_t saturation = 127)
+		: TemplateResponseCurveS<int32_t, INT32_MIN, INT32_MAX, uint32_t, ResponseCurveU32>(saturation)
+	{}
 };
 #endif
