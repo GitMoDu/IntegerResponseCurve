@@ -17,16 +17,21 @@
 
 
 TemplateResponseCurveU8 LinearU8(255);
-TemplateResponseCurveS8<TemplateResponseCurveU8> LinearS8(255);
 TemplateResponseCurveU16 LinearU16(255);
+TemplateResponseCurveU32 LinearU32(255);
 TemplateResponseCurveS16<TemplateResponseCurveU16> LinearS16(255);
+TemplateResponseCurveS8<TemplateResponseCurveU8> LinearS8(255);
+TemplateResponseCurveS32<TemplateResponseCurveU8> LinearS32(255);
 
 Power2CurveU8 Power2U8(255);
-Power2CurveU16 PowerSquare16(255);
+Power2CurveU16 Power2U16(255);
+Power2CurveU32 Power2U32(255);
 Power3CurveU8 Power3U8(255);
 Power3CurveU16 Power3U16(255);
+Power3CurveU32 Power3U32(255);
 Root2CurveU8 RootU8(255);
 Root2CurveU16 RootU16(255);
+//Root2CurveU32 RootU32(255);//TODO:
 
 
 const uint16_t LinearTestSize = 256;
@@ -113,7 +118,7 @@ void MeasureDurations()
 	Timestamp = micros();
 	for (uint16_t i = 0; i < ResponseDurationTestCount; i++)
 	{
-		TestValue = LinearS8.Get(i);
+		TestValue = LinearS8.Get((int8_t)(i - INT8_MAX));
 	}
 	uint32_t ReferenceDurationS8 = ((micros() - Timestamp) * 1000) / ResponseDurationTestCount;
 	DummyValue += TestValue;
@@ -136,6 +141,23 @@ void MeasureDurations()
 	uint32_t ReferenceDurationS16 = ((micros() - Timestamp) * 1000) / ResponseDurationTestCount;
 	DummyValue += TestValue;
 
+	Timestamp = micros();
+	for (uint16_t i = 0; i < ResponseDurationTestCount; i++)
+	{
+		TestValue = LinearU32.Get(i);
+	}
+	uint32_t ReferenceDurationU32 = ((micros() - Timestamp) * 1000) / ResponseDurationTestCount;
+	DummyValue += TestValue;
+
+
+	Timestamp = micros();
+	for (uint16_t i = 0; i < ResponseDurationTestCount; i++)
+	{
+		TestValue = LinearS32.Get(i);
+	}
+	uint32_t ReferenceDurationS32 = ((micros() - Timestamp) * 1000) / ResponseDurationTestCount;
+	DummyValue += TestValue;
+
 
 	///
 	Timestamp = micros();
@@ -150,9 +172,17 @@ void MeasureDurations()
 	Timestamp = micros();
 	for (uint16_t i = 0; i < ResponseDurationTestCount; i++)
 	{
-		TestValue = PowerSquare16.Get(i);
+		TestValue = Power2U16.Get(i);
 	}
 	uint32_t DurationPowerSquare16 = ((micros() - Timestamp) * 1000) / ResponseDurationTestCount;
+	DummyValue += TestValue;
+
+	Timestamp = micros();
+	for (uint16_t i = 0; i < ResponseDurationTestCount; i++)
+	{
+		TestValue = Power2U32.Get(i);
+	}
+	uint32_t DurationPowerSquare32 = ((micros() - Timestamp) * 1000) / ResponseDurationTestCount;
 	DummyValue += TestValue;
 
 
@@ -171,6 +201,14 @@ void MeasureDurations()
 		TestValue = Power3U16.Get(i);
 	}
 	uint32_t DurationPowerCube16 = ((micros() - Timestamp) * 1000) / ResponseDurationTestCount;
+	DummyValue += TestValue;
+
+	Timestamp = micros();
+	for (uint16_t i = 0; i < ResponseDurationTestCount; i++)
+	{
+		TestValue = Power3U32.Get(i);
+	}
+	uint32_t DurationPowerCube32 = ((micros() - Timestamp) * 1000) / ResponseDurationTestCount;
 	DummyValue += TestValue;
 
 	Timestamp = micros();
@@ -197,16 +235,23 @@ void MeasureDurations()
 	DurationPowerSquare16 -= ReferenceDurationU16 - ToleranceNanos;
 	DurationPowerCube16 -= ReferenceDurationU16 - ToleranceNanos;
 	DurationRoot16 -= ReferenceDurationU16 - ToleranceNanos;
+	DurationPowerSquare32 -= ReferenceDurationU32 - ToleranceNanos;
+	DurationPowerCube32 -= ReferenceDurationU32 - ToleranceNanos;
+	//DurationRoot32 -= ReferenceDurationU32 - ToleranceNanos;
 
 	Serial.println(F("Overhead (ns)"));
 	Serial.print(F("U8: "));
 	Serial.println(ReferenceDurationU8);
 	Serial.print(F("U16: "));
 	Serial.println(ReferenceDurationU16);
+	Serial.print(F("U32: "));
+	Serial.println(ReferenceDurationU32);
 	Serial.print(F("S8: "));
 	Serial.println(ReferenceDurationS8);
 	Serial.print(F("S16: "));
 	Serial.println(ReferenceDurationS16);
+	Serial.print(F("S32: "));
+	Serial.println(ReferenceDurationS32);
 	Serial.println();
 
 	Serial.print(F("Response curve processing duration "));
@@ -235,6 +280,13 @@ void MeasureDurations()
 	Serial.println(DurationPowerCube16);
 	Serial.print(F("RootU16: "));
 	Serial.println(DurationRoot16);
+
+	Serial.print(F("Square32: "));
+	Serial.println(DurationPowerSquare32);
+	Serial.print(F("Cube32: "));
+	Serial.println(DurationPowerCube32);
+	/*Serial.print(F("RootU32: "));
+	Serial.println(DurationRoot32);*/
 	Serial.println();
 	Serial.println(DummyValue);
 }
