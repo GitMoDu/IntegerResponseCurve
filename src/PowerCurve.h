@@ -31,6 +31,19 @@ public:
 	}
 };
 
+class Power2CurveU32 : public TemplateResponseCurveU32
+{
+public:
+	Power2CurveU32(const uint8_t saturation = 127) : TemplateResponseCurveU32(saturation)
+	{}
+
+	virtual const uint32_t Process(const uint32_t input)
+	{
+		// Optimized version of pow(input, 2) / UINT32_MAX.
+		return (((uint64_t)input * input) + input) >> 32;
+	}
+};
+
 class Power3CurveU8 : public TemplateResponseCurveU8
 {
 public:
@@ -55,6 +68,20 @@ public:
 		// Optimized version of pow(input, 3) / (UINT32_MAX - ((uint32_t)UINT16_MAX * 3)).
 		uint32_t Power2Shifted = (uint32_t)input * input >> 16;
 		return (((Power2Shifted)*input) + (Power2Shifted + ((uint32_t)input + 1))) >> 16;
+	}
+};
+
+class Power3CurveU32 : public TemplateResponseCurveU32
+{
+public:
+	Power3CurveU32(const uint8_t saturation = 127) : TemplateResponseCurveU32(saturation)
+	{}
+
+	virtual const uint32_t Process(const uint32_t input)
+	{
+		// Optimized version of pow(input, 3) / (UINT64_MAX - ((uint32_t)UINT32_MAX * 3)).
+		uint64_t Power2Shifted = (uint64_t)input * input >> 32;
+		return (((Power2Shifted)*input) + (Power2Shifted + ((uint64_t)input + 1))) >> 32;
 	}
 };
 #endif
