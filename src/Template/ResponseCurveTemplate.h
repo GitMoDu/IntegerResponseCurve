@@ -138,10 +138,10 @@ public:
 };
 
 template<class ResponseCurveU, typename UnsignedType>
-class TemplateDoubleCurve : public ResponseCurveU
+class TemplateDoubleChainedCurve : public ResponseCurveU
 {
 public:
-	TemplateDoubleCurve(const uint8_t saturation = 127)
+	TemplateDoubleChainedCurve(const uint8_t saturation = 127)
 		: ResponseCurveU(saturation)
 	{}
 
