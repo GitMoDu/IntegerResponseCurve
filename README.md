@@ -8,7 +8,7 @@ Features:
 
 Provided with a set of template to expand functionality, including:
 
-- Templates for 8 bit and 16 bit wide curves.
+- Templates for 8 bit, 16 bit and 32 bit wide curves.
 - Sign conversion of unsigned curve to mirrored signed curve.
 - Double chaining.
 
